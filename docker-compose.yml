@@ -1,0 +1,62 @@
+version: '3'
+
+services:
+  url-mongodb:
+    container_name: db
+    image: mongo:6-jammy
+    restart: always
+    volumes:
+      - url-mongodata:/data/db
+    networks:
+      - shortener
+ #   ports:
+ #     - "127.0.0.1:27017:27017"
+    environment:
+      HOST: ${MONGO_HOST:-url-mongodb}
+      PORT: ${MONGO_PORT:-27017}
+
+  url-redis:
+    container_name: redis
+    image: redis:7-alpine3.18
+    restart: always
+    volumes:
+      - url-redisdata:/data
+    networks:
+      - shortener
+#    ports:
+#      - "127.0.0.1:6379:6379"
+    environment:
+      HOST: ${REDIS_HOST:-url-redis}
+      PORT: ${REDIS_PORT:-6379}
+
+  url-app:
+    container_name: url-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    networks:
+      - shortener
+    depends_on:
+      - url-mongodb
+      - url-redis
+#    volumes:
+#      - ./app/:/app/app/
+    environment:
+      HOST: ${HOST:-0.0.0.0}
+      PORT: ${PORT:-3000}
+      REDIS_HOST: ${REDIS_HOST:-url-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      MONGO_HOST: ${MONGO_HOST:-url-mongodb}
+      MONGO_PORT: ${MONGO_PORT:-27017}
+      SESSION_SECRET: ${SESSION_SECRET:-keyboard cat}
+      MAX_SAFE_INTEGER_FOR_GENERATOR: ${MAX_SAFE_INTEGER_FOR_GENERATOR:-4294967296}
+    ports:
+      - "127.0.0.1:3000:3000"
+
+networks:
+  shortener:
+
+volumes:
+  url-mongodata:
+  url-redisdata:

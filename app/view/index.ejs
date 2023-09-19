@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Yet Another URL Shortener</title>
+</head>
+<style>
+    html { color-scheme: light dark; }
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+    form {
+        display: flex;
+        justify-content: space-between;
+    }
+    form > * {
+        padding: 1ch 2ch;
+    }
+    form > input {
+        width: 40%;
+    }
+    form > button {
+        width: 20%;
+    }
+    main {
+        text-align: center;
+    }
+    main table {
+        margin: 0 auto;
+    }
+</style>
+<body>
+<h1>Yet Another URL Shortener</h1>
+<form action="/shorten" method="post">
+    <input type="text" name="url" placeholder="Enter URL" required>
+    <input type="text" name="subpart" placeholder="Custom short URL (optional)">
+    <button type="submit">Shorten</button>
+</form>
+<br/>
+<main>
+    <% if (urls && urls.length) { %>
+    <table>
+        <thead>
+        <tr>
+            <th>Original URL</th>
+            <th>Short URL</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% urls.forEach(url => { %>
+            <tr>
+                <td><a href="<%= url.url %>" target="_blank"><%= url.url %></a></td>
+                <td><a href="/<%= url.subpart %>" target="_blank">/<%= url.subpart %></a></td>
+            </tr>
+        <% }); %>
+        </tbody>
+    </table>
+    <% } else { %>
+    <p>No short URLs here! Maybe create a new one?</p>
+    <% } %>
+    <% if (pages) { %>
+        <p>
+            <% if (page > 1 && page <= pages) { %>
+                <a href="?page=<%= page - 1 %>&limit=<%= limit %>">[ &lt; ]</a>
+            <% } %>
+            Page <%= page %>/<%= pages %>
+            <% if (page < pages) { %>
+                <a href="?page=<%= page + 1 %>&limit=<%= limit %>">[ &gt; ]</a>
+            <% } %>
+        </p>
+    <% } %>
+</main>
+</body>
+</html>
